@@ -1,0 +1,7 @@
+{
+  "name": "chatdocs-flask",
+  "private": true,
+  "scripts": {
+    "dev": "python app.py"
+  }
+}
