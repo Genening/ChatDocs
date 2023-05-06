@@ -21,7 +21,7 @@ app.post('/api/upload', (req, res) => {
       return res.status(500).send(err);
     }
 
-    res.send('File uploaded!');
+    res.send('success');
   });
 });
 
