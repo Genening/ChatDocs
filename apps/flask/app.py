@@ -17,9 +17,11 @@ def hello():
 @app.route("/api/upload", methods=["POST"])
 def upload_file():
     file = request.files["file"]
-    file.save("uploads/" + file.filename)
-
-    return "File Uploaded!"
+    if file:
+      file.save("uploads/" + file.filename)
+      return "success"
+    else:
+      return "failed"
 
 
 
