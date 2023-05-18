@@ -6,7 +6,7 @@ import hashlib
 from extract_file import get_file_content
 
 # 设置openai的api key
-openai.api_key  = "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"
+openai.api_key  = "sk-"
 # 初始化全局常量
 CONTEXT_TOKEN_LIMIT = 1500
 
