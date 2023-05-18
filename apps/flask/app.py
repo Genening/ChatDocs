@@ -6,7 +6,7 @@ import hashlib
 from extract_file import get_file_content
 
 # 设置openai的api key
-openai.api_key  = "sk-"
+openai.api_key  = "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"
 # 初始化全局常量
 CONTEXT_TOKEN_LIMIT = 1500
 
@@ -61,7 +61,7 @@ def get_question_list():
   if len(content) > CONTEXT_TOKEN_LIMIT:
     content = content[:CONTEXT_TOKEN_LIMIT]
 
-  prompt = u"Suggest 3 simple, clear, single, short questions base on the context, answer in the same language of context\n\nContext:"+content+u"\n\nAnswer with the language used in context, please number questions in 1/2/3, and the first line of answer is 'Suggest question: ', please strict follow markdown format, end with\\n, questions are:"
+  prompt = u"Suggest 3 simple, clear, single, short questions base on the context, use same language in the context, \n\nContext:"+content+u"\n\nThe first line of response is 'Suggest question: '. Please number questions in 1/2/3, no need foe answers, strictly follow the markdown format and show the answer clearly, questions are:"
   messages = [{"role": "user", "content": prompt}]
   model = "gpt-3.5-turbo"
   temperature = 0

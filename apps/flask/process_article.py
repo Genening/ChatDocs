@@ -16,7 +16,7 @@ CONTEXT_TOKEN_LIMIT = 1500
 TOKENS_PER_TOPIC = 2000
 TOPIC_NUM_MIN = 3
 TOPIC_NUM_MAX = 10
-openai.api_key = "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"
+openai.api_key = "sk-"
 
 
 def get_topic_num(sources):

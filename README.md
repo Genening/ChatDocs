@@ -7,6 +7,11 @@
 Run `nx graph` to see a diagram of the dependencies of the projects.
 
 ## Run project
+In the root directory, run this command to install packages
+```
+pnpm i
+pnpm --filter ./apps/frontend i
+```
 
 In the root directory, run this command to start frontend project
 

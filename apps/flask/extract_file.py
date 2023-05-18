@@ -1,6 +1,7 @@
 import PyPDF2
 import pytesseract
 from PIL import Image
+from bs4 import BeautifulSoup
 
 # 设置tesseract.exe路径，注意要和安装的路径一致
 pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
@@ -25,7 +26,7 @@ def extract_pdf(filepath):
 
   return text
 
-
+# 解析图片文件
 def extract_img(filepath):
   img = Image.open(filepath)
   img = img.convert('L')
@@ -33,6 +34,13 @@ def extract_img(filepath):
 
   return text
 
+# 解析html文件
+def extract_html(filepath):
+  with open(filepath, "r", encoding="utf-8") as f:
+    soup = BeautifulSoup(f.read(), "html.parser")
+    text = soup.get_text()
+
+  return text
 
 # 获取文件内容
 def get_file_content(filepath):
@@ -45,5 +53,7 @@ def get_file_content(filepath):
       content += extract_pdf(filepath)
     elif filepath.endswith(".png") or filepath.endswith(".jpg") or filepath.endswith(".jpeg"):
       content += extract_img(filepath)
+    elif filepath.endswith(".html"):
+      content += extract_html(filepath)
 
   return content
