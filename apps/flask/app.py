@@ -3,14 +3,18 @@ from flask_cors import CORS
 import openai
 import os
 import hashlib
+from extract_file import get_file_content
 
-# import
-openai.api_key  = "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"
+# 设置openai的api key
+openai.api_key  = "sk-"
+# 初始化全局常量
+CONTEXT_TOKEN_LIMIT = 1500
 
+# 初始化flask
 app = Flask(__name__)
 CORS(app)
 
-
+# 开辟接口
 @app.route('/')
 def hello():
   return 'Hello, World!'
@@ -18,14 +22,18 @@ def hello():
 
 @app.route("/api/upload", methods=["POST"])
 def upload_file():
+  docpath = request.args.get("docpath")
   file = request.files["file"]
   if file:
-    split_name = file.filename.split(".")
-    folder = hashlib.md5(split_name[0].encode()).hexdigest()
-    # 判断文件夹是否存在
-    if not os.path.exists(f"uploads/{folder}"):
-      os.mkdir(f"uploads/{folder}")
-    file.save(f"uploads/{folder}/" + file.filename)
+    if docpath and os.path.exists(f"uploads/{docpath}"):
+      file.save(f"uploads/{docpath}/" + file.filename)
+    else:
+      split_name = file.filename.split(".")
+      folder = hashlib.md5(split_name[0].encode()).hexdigest()
+      # 判断文件夹是否存在
+      if not os.path.exists(f"uploads/{folder}"):
+        os.mkdir(f"uploads/{folder}")
+      file.save(f"uploads/{folder}/" + file.filename)
     return "success"
   else:
     return "failed"
@@ -41,16 +49,19 @@ def get_file_list():
   filepath = request.args.get("filepath")
   return jsonify(os.listdir(f"uploads/{filepath}"))
 
-
 @app.route("/api/getQuestionList", methods=["GET"])
 def get_question_list():
   docpath = request.args.get("docpath")
   content = ""
   for file in os.listdir(f"uploads/{docpath}"):
-    with open(f"uploads/{docpath}/{file}", "r", encoding="utf-8") as f:
-      content += f.read()
+    filepath = f"uploads/{docpath}/{file}"
+    content += get_file_content(filepath)
 
-  prompt = u"Suggest 3 simple, clear, single, short questions base on the context, answer in the same language of context\n\nContext:"+content+u"\n\nAnswer with the language used in context, please number questions in 1/2/3, and the first line is 'Suggest question: ', strict follow markdown format, end with\\n, questions are:"
+  # 设置最大长度
+  if len(content) > CONTEXT_TOKEN_LIMIT:
+    content = content[:CONTEXT_TOKEN_LIMIT]
+
+  prompt = u"Suggest 3 simple, clear, single, short questions base on the context, answer in the same language of context\n\nContext:"+content+u"\n\nAnswer with the language used in context, please number questions in 1/2/3, and the first line of answer is 'Suggest question: ', please strict follow markdown format, end with\\n, questions are:"
   messages = [{"role": "user", "content": prompt}]
   model = "gpt-3.5-turbo"
   temperature = 0
@@ -70,10 +81,13 @@ def get_completion():
   docpath = request.args.get("docpath")
   content = ""
   for file in os.listdir(f"uploads/{docpath}"):
-    with open(f"uploads/{docpath}/{file}", "r", encoding="utf-8") as f:
-      content += f.read()
+    content += get_file_content(f"uploads/{docpath}/{file}")
 
-  prompt = u"Question: "+question+u"\n\nContext:"+content+u"\n\nAnswer with the content includes and the language used in context, add some suitable emoji in the answer and encourage user to ask more in the end of answer, the answer is:"
+  # 设置最大长度
+  if len(content) > CONTEXT_TOKEN_LIMIT:
+    content = content[:CONTEXT_TOKEN_LIMIT]
+
+  prompt = u"Question: "+question+u"\n\nContext:"+content+u"\n\nAnswer with the content includes and the language used in context, please specify the page number relate with answer if there is anyone, add some suitable emojis in the answer and encourage user to ask more in the end of answer, the answer is:"
 
   # temprary model
   model="gpt-3.5-turbo"
